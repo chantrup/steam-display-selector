@@ -133,7 +133,6 @@ if not exist "%~dp0games.bat" (
 )
 call "%~dp0games.bat"
 
-
 :: ============================================================
 :: SCRIPT LOGIC - no need to edit anything below this line
 :: ============================================================
@@ -168,7 +167,7 @@ set FILETYPE=!FILETYPE_%GAME_KEY%!
 if not defined CONFIG (
     echo.
     echo  ERROR: No config path found for game key "%GAME_KEY%".
-    echo  Add it to games.bat (in the same folder as this script).
+    echo  Add it to games.bat - in the same folder as this script.
     echo.
     pause
     exit /b 1
@@ -177,7 +176,7 @@ if not defined CONFIG (
 if not defined FILETYPE (
     echo.
     echo  ERROR: No filetype found for game key "%GAME_KEY%".
-    echo  Add it to games.bat (in the same folder as this script).
+    echo  Add it to games.bat - in the same folder as this script.
     echo.
     pause
     exit /b 1
