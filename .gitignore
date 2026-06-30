@@ -12,3 +12,9 @@ desktop.ini
 # Local test/backup configs
 *.bak
 *.local
+
+engine/history.json
+
+# Claude Code per-machine settings (not *.local - this is settings.local.json,
+# where .local isn't the final extension, so the pattern above doesn't catch it)
+.claude/settings.local.json

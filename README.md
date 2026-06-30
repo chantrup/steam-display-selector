@@ -1,185 +1,163 @@
-# Steam Display Selector
+# Steam Display Selector - v2
 
-**Launch any Steam game on the monitor you choose — without changing your primary display.**
+Pick which monitor a Steam game launches on. When you click **Play**, this
+tool runs first, asks which monitor you want, edits the game's config so the
+renderer comes up on that display from the start, then launches the game.
 
-When you click Play, a small prompt asks which monitor to use. Pick one, and the game launches on that display with its renderer initialized correctly from the start.
+## What's different in v2
 
----
+In v1, almost every new game needed new logic hardcoded into the script
+(`plain` vs `utf16` vs `string-multi-field`, a `DELETE` keyword, a special
+regex for float resolutions, a separate `xmlfield.ps1` for XML attributes).
 
-## The problem this solves
+v2 removes all of that. There is **one** mechanism for every game:
 
-If you have multiple monitors, you've probably hit this: a game always opens on your primary monitor, and moving it afterward with `Win + Shift + Arrow` sometimes causes frame drops, stutter, or a blurrier image.
+> A game profile is just *"which line(s) in the config change when you switch
+> monitors, and what each of those lines looks like for each monitor."*
+> Applying a monitor = find that line, swap it for the target monitor's version
+> of the line. **"Absent" is a valid version** - that's how a field a game
+> deletes on its primary monitor is handled.
 
-That happens because the game initializes its rendering pipeline (refresh rate, resolution, swap chain) against whatever monitor it launched on. Moving the window afterward doesn't always force it to reinitialize cleanly — so you're left running with settings tuned for the wrong display.
+Encoding (UTF-8 / UTF-16 / BOM), XML vs INI, one field vs many,
+delete-the-field-entirely - all collapse into the same find-and-swap step.
+**No per-game code.** New games are pure data in `gameslist.json`.
 
-The common "fixes" people are told to use all have downsides:
+## Adding a game - the only manual step
 
-- **Set the target as your Windows primary monitor** — disrupts your desktop layout, and switching back is inconsistent.
-- **Move the window after launch** (manually, or with tools like DisplayFusion) — the renderer is already bound to the original monitor, causing the performance issues above. This also tends to fail for fullscreen games specifically.
-- **Big Picture Mode** — works for some setups but is clunky for quick swaps.
+You don't write rules or understand the file format. You let the tool *watch*.
 
-Steam has no built-in feature to pick a launch monitor, and most games don't expose a reliable launch parameter for it.
+Double-click `Add-Game.bat` in the folder. (Or, if you prefer running it from an
+already-open terminal: `powershell -ExecutionPolicy Bypass -File .\engine\Add-Game.ps1`)
 
-**Steam Display Selector takes a different approach:** it edits the game's own config file *before* the game launches, so the renderer starts on the correct monitor from the very beginning. No primary-monitor switching, no after-the-fact window moving.
+Either way, nothing changes permanently on your system - the execution-policy
+bypass only applies to that one run, so you never need to enable PowerShell
+scripts machine-wide just to use this tool.
 
----
+The wizard asks for the game key, a name, and the config file path. The key
+can only use letters, numbers, underscore, and hyphen - no spaces or symbols.
+This isn't arbitrary: the key has to survive being passed through Steam's
+Launch Option field (which splits on spaces) and Windows batch files (where
+`%` is a special character), so the wizard rejects anything else and asks
+again. `HD2`, `MHWILDS`, `MY-COOL-GAME` are all fine; `Crimson Desert` is not.
 
-## How it works
+Then, for each monitor you care about:
 
-1. You add the script to a game's Steam Launch Options.
-2. When you click Play, Steam runs the script first.
-3. The script asks which monitor you want (1–4), or press Enter to keep your current config.
-4. It edits the game's config file to point at that monitor.
-5. It hands off to Steam, and the game launches on the correct display.
+1. In the **game's** display settings, set it to that monitor.
+2. **Fully quit** the game so it writes the config.
+3. Press Enter to snapshot.
 
----
+It diffs the snapshots, figures out exactly which line(s) the game changes per
+monitor (including any it deletes), shows you what it found, and lets you
+exclude any that aren't actually monitor-related before saving. Some games
+auto-tune rendering settings (dynamic resolution, VRS, shadow quality)
+between sessions regardless of monitor - those will show up as detected
+lines too, so check each one before saving. Whatever you keep gets written
+into `gameslist.json`. Done.
+
+> Finding the config file is the one thing the wizard can't do for you. Search:
+> `"<Game Name>" config file location monitor AppData Windows`, or set the
+> monitor in-game and look for the file that changed under `%APPDATA%`,
+> `%LOCALAPPDATA%`, or the game's install folder.
+
+## Seeing what's already added
+
+`gameslist.json` is plain data, but you shouldn't need to open it just to see
+what's in there. Double-click `List-Games.bat`, or run it from a terminal:
+`powershell -ExecutionPolicy Bypass -File .\engine\List-Games.ps1`
+
+This prints one line per game - key, name, which monitors have been captured,
+how many fields, and the config path - and offers to remove a game by key if
+you ask for one. You never need to hand-edit the JSON to add, inspect, or
+remove a game.
+
+## Setting the Steam launch option
+
+Right-click the game in Steam -> **Properties** -> **Launch Options**:
+
+```
+"C:\Path\To\SteamDisplaySelector.bat" GAMEKEY %command%
+```
+
+Replace `GAMEKEY` with the key you used in the wizard.
 
 ## Files
 
-This tool is **three files**, which must all live in the **same folder**:
-
-| File | Purpose |
-|------|---------|
-| `SteamDisplaySelector.bat` | The engine. Contains all the script logic. You shouldn't need to edit this. |
-| `games.bat` | The game registry. A plain list of per-game settings. This is the file you'll actually edit when adding a game. |
-| `xmlfield.ps1` | A helper script used only by games that store their monitor setting as an XML attribute (e.g. Crimson Desert). Required for those games; harmless if unused. |
-
-Keeping the registry in its own file means you never have to scroll through script logic to add a game — `games.bat` is just a clean, readable list.
-
----
-
-## Requirements
-
-- Windows
-- Steam
-- A game that stores its monitor/display selection in an editable config file (most do)
-
----
-
-## Setup
-
-1. **Download all three files** (`SteamDisplaySelector.bat`, `games.bat`, `xmlfield.ps1`) and save them together in the same folder, e.g. `C:\Users\YourName\Documents\SteamDisplaySelector\`.
-
-2. **Add your game to `games.bat`** (see [Adding a game](#adding-a-game) below). A few popular games are included as working examples.
-
-3. **Set the Steam Launch Option** for your game:
-   - Right-click the game in Steam → **Properties** → **General** → **Launch Options**
-   - Enter: `"C:\Path\To\SteamDisplaySelector.bat" GAMEKEY %command%`
-   - Replace the path with where you saved the files, and `GAMEKEY` with the key you defined in `games.bat`.
-
-4. **Click Play.** Pick your monitor when prompted.
-
----
-
-## Adding a game
-
-Every game stores its display setting differently, so adding one means finding three things and adding a few lines to **`games.bat`**.
-
-The script supports three config formats:
-
-### `plain`
-For plain-text config files where the monitor is a simple number.
-Example: `fullscreen_output = 0`
+Everything you actually click sits at the top level. The PowerShell scripts
+that do the work live in `engine/` - you never need to open that folder.
 
 ```
-set CONFIG_MYKEY=C:\Users\YourName\AppData\Roaming\...\settings.cfg
-set FIELD_MYKEY=fullscreen_output
-set FILETYPE_MYKEY=plain
+SteamDisplaySelector/
+|-- README.md
+|-- CONTRIBUTING.md
+|-- LICENSE
+|-- Add-Game.bat            <- double-click to learn a new game
+|-- List-Games.bat          <- double-click to see/remove what's saved
+|-- SteamDisplaySelector.bat  <- Steam calls this one automatically; you don't run it yourself
+|-- gameslist.json           <- your games, as data
+`-- engine/
+    |-- Add-Game.ps1
+    |-- List-Games.ps1
+    |-- SteamDisplaySelector.ps1
+    `-- history.json         <- auto-created; your last 2 monitor picks per game
 ```
 
-Monitor values are 0-based: Monitor 1 = `0`, Monitor 2 = `1`, etc.
+| File | Role |
+|------|------|
+| `SteamDisplaySelector.bat` | Thin launcher Steam calls; sets execution policy and forwards to the engine. |
+| `Add-Game.bat` | Double-click launcher for the auto-learn wizard - no manual execution-policy bypass needed. |
+| `List-Games.bat` | Double-click launcher to see/remove what's saved. |
+| `gameslist.json` | All your games as data. Ships with Helldivers 2 as a worked example. |
+| `engine/SteamDisplaySelector.ps1` | The engine: picker -> find-and-swap -> launch. You never edit this to add a game. |
+| `engine/Add-Game.ps1` | Auto-learn wizard. Captures snapshots, derives rules, writes `gameslist.json`. |
+| `engine/List-Games.ps1` | Prints a clean index of every stored game; can remove one by key. |
+| `engine/history.json` | Auto-created. Tracks your last 2 monitor picks per game, shown in the picker. Safe to delete - it just regenerates. |
 
-### `utf16`
-For UTF-16 encoded XML config files where the monitor is a number.
-Example: `<OutputMonitor>0</OutputMonitor>`
+## gameslist.json schema
 
-```
-set CONFIG_MYKEY=C:\Users\YourName\AppData\Roaming\...\GraphicsConfig.xml
-set FIELD_MYKEY=OutputMonitor
-set FILETYPE_MYKEY=utf16
-```
-
-> **How to tell if a file is UTF-16:** open it in Notepad. If it looks normal, it's `plain`. If it looks garbled or full of strange characters, it's `utf16`.
-
-### `string-multi-field`
-For games where one or more fields need to change when switching monitors — a monitor name, a display index, a resolution, or a combination. Each monitor gets one line listing all fields to update, separated by semicolons.
-
-Single field:
-```
-set TARGET_MYKEY_1=TargetDisplay=1:YourMonitorName
-```
-
-Multiple fields (commas inside values escaped with `^`):
-```
-set TARGET_MYKEY_1=DisplayName=Monitor1Name;FullScreenDisplayMode=464;NormalWindowResolution=(2560^,1440)
-```
-
-**Deleting a field** — some games remove a field entirely when set to their default/primary monitor, rather than writing an explicit value. Use `DELETE` as the value for that monitor:
-```
-set TARGET_MYKEY_1=_display=DELETE
-set TARGET_MYKEY_3=_display=YourMonitorName 0
-```
-
-**XML attribute fields** — if a field's name starts with an underscore (like `_display` above), the script treats it as an XML attribute-style field (e.g. `<OptionStringVector Name="_display" _value="..."/>`) and edits it via the included `xmlfield.ps1` helper. This only applies to underscore-prefixed field names; everything else is treated as a plain `Field=Value` line.
-
-```
-set CONFIG_MYKEY=C:\...\config.ini
-set FILETYPE_MYKEY=string-multi-field
-set TARGET_MYKEY_1=...
-set TARGET_MYKEY_3=...
+```json
+{
+  "monitorLabels": { "1": "Monitor 1 (Main)", "3": "Monitor 3 (usual swap)" },
+  "games": {
+    "GAMEKEY": {
+      "name": "Display Name",
+      "config": "%APPDATA%\\Vendor\\Game\\config.ext",
+      "fields": [
+        {
+          "locator": { "kind": "wrap", "prefix": "Field=", "suffix": "" },
+          "anchor": null,
+          "lines": { "1": "Field=ValueForMon1", "3": "Field=ValueForMon3" }
+        }
+      ]
+    }
+  }
+}
 ```
 
-### Finding the config file and field
+- **locator.kind `wrap`** - find the line by an invariant `prefix` + `suffix`;
+  used for value-changing fields.
+- **locator.kind `exact`** - match a whole line; used for present/absent fields.
+- **anchor** - for an absent->present field, the line to insert after.
+- **lines** - per monitor, the full line text, or `"__ABSENT__"` to remove it.
 
-1. Search the web for `"[Game Name] config file location monitor Windows"`. Config files commonly live in `%APPDATA%`, `%LOCALAPPDATA%`, or the game's install folder.
-2. Open the config in Notepad (or a code editor).
-3. Change the monitor in the game's own settings, switch to a different monitor, quit, and re-open the config. Whatever field changed is the one you need.
-4. **Verify the indexing** by editing the value manually and launching the game to confirm which monitor it opens on before trusting the script with it.
-5. If you suspect a field disappears entirely on a particular monitor (rather than changing value), test that explicitly — switch back to that monitor in-game, quit, and check whether the field is gone. If so, use `DELETE` for that monitor's entry.
+You normally never hand-edit this; the wizard writes it, and `List-Games.ps1`
+is how you inspect it. In practice `fields` stays small per game - it only
+holds the lines that actually differ between monitors (typically 1-5), not
+the whole config file, even for configs with hundreds of lines total.
 
-> The included games (Helldivers 2, Elden Ring Nightreign, Monster Hunter Wilds, Pragmata, Crimson Desert) use **one user's** specific config paths and monitor names as real-world examples. Replace those values with your own paths and monitor names.
+## Limits (honest)
 
----
+This works for any game that saves its monitor choice to an **editable config
+file on disk** - the large majority. It will **not** work for games that:
 
-## Included examples
+- store the display in the **Windows registry** rather than a file,
+- keep it in an **encrypted/opaque binary** blob,
+- **re-pick the primary display** at every launch regardless of config, or
+- overwrite the file from **cloud sync** after the edit.
 
-| Game | Format | Notes |
-|------|--------|-------|
-| Helldivers 2 | `plain` | Single numeric field |
-| Elden Ring Nightreign | `utf16` | UTF-16 encoded XML |
-| Pragmata | `string-multi-field` | Single `index:name` field |
-| Monster Hunter Wilds | `string-multi-field` | Five fields incl. resolution |
-| Crimson Desert | `string-multi-field` | XML attribute field, uses `DELETE` for its default monitor |
-
-These cover all current formats, so most new games can be added by following the closest matching example.
-
----
-
-## How this compares to window-moving tools (e.g. DisplayFusion)
-
-Tools like DisplayFusion can move a game's window to a specific monitor using triggers that fire on window creation. This works for windowed games, but its own documentation acknowledges it struggles with fullscreen games specifically, since many fullscreen titles force themselves to the primary monitor and can't be moved, or don't send the window-creation event the trigger needs at all.
-
-That's the same underlying problem this tool exists to avoid: moving a window *after* launch doesn't undo the fact that the game's renderer already initialized against the wrong monitor's refresh rate, resolution, and swap chain. Steam Display Selector edits the game's config *before* launch instead, so the renderer initializes correctly the first time — no window-moving involved.
-
----
-
-## Contributing
-
-This tool gets more useful the more games are documented. If you work out the config details for a game that isn't listed, contributions are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
-
-If a game uses a config format none of the three handlers support, open an issue describing what changes in the config when you switch monitors, and it can potentially be added as a new format.
-
----
-
-## Support
-
-If this saved you some time, you can support the project here:
-**[GitHub Sponsors / Ko-fi link — add your link]**
-
----
+If the wizard sees *many* changed lines (timestamps, play counters, window
+position), some may be noise - re-capture without changing other settings in
+between, and review what it reports before saving.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Free to use, modify, and share.
-
-Created by **BChan**.
+MIT.

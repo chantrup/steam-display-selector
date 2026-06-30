@@ -1,0 +1,160 @@
+﻿{
+    "monitorLabels":  {
+                          "1":  "Monitor 1 (Main)",
+                          "2":  "Monitor 2",
+                          "3":  "Monitor 3 (usual swap)",
+                          "4":  "Monitor 4"
+                      },
+    "games":  {
+                  "HD2":  {
+                              "name":  "Helldivers 2",
+                              "config":  "%APPDATA%\\Arrowhead\\Helldivers2\\user_settings.config",
+                              "fields":  [
+                                             {
+                                                 "desc":  "fullscreen_output =",
+                                                 "locator":  {
+                                                                 "kind":  "wrap",
+                                                                 "prefix":  "fullscreen_output = ",
+                                                                 "suffix":  ""
+                                                             },
+                                                 "anchor":  null,
+                                                 "lines":  {
+                                                               "1":  "fullscreen_output = 0",
+                                                               "3":  "fullscreen_output = 2"
+                                                           }
+                                             }
+                                         ]
+                          },
+                  "NIGHTREIGN":  {
+                                     "name":  "Elden Ring: Nightreign",
+                                     "config":  "%APPDATA%\\Nightreign\\GraphicsConfig.xml",
+                                     "fields":  [
+                                                    {
+                                                        "desc":  "\u0000\u003c\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u0000",
+                                                        "locator":  {
+                                                                        "kind":  "wrap",
+                                                                        "prefix":  "\u0000\u003c\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u0000",
+                                                                        "suffix":  "\u0000\u003c\u0000/\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u0000\r\u0000"
+                                                                    },
+                                                        "anchor":  null,
+                                                        "lines":  {
+                                                                      "1":  "\u0000\u003c\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u00000\u0000\u003c\u0000/\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u0000\r\u0000",
+                                                                      "3":  "\u0000\u003c\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u00002\u0000\u003c\u0000/\u0000O\u0000u\u0000t\u0000p\u0000u\u0000t\u0000M\u0000o\u0000n\u0000i\u0000t\u0000o\u0000r\u0000\u003e\u0000\r\u0000"
+                                                                  }
+                                                    }
+                                                ]
+                                 },
+                  "PRAGMATA":  {
+                                   "name":  "PRAGMATA",
+                                   "config":  "D:\\SteamLibrary\\steamapps\\common\\PRAGMATA\\config.ini",
+                                   "fields":  [
+                                                  {
+                                                      "desc":  "TargetDisplay=",
+                                                      "locator":  {
+                                                                      "kind":  "wrap",
+                                                                      "prefix":  "TargetDisplay=",
+                                                                      "suffix":  ""
+                                                                  },
+                                                      "anchor":  null,
+                                                      "lines":  {
+                                                                    "1":  "TargetDisplay=1:XB271HU",
+                                                                    "3":  "TargetDisplay=3:Q70A"
+                                                                }
+                                                  }
+                                              ]
+                               },
+                  "MHWILDS":  {
+                                  "name":  "Monster Hunter Wilds",
+                                  "config":  "D:\\SteamLibrary\\steamapps\\common\\MonsterHunterWilds\\config.ini",
+                                  "fields":  [
+                                                 {
+                                                     "desc":  "FullScreenDisplayModeIndex=",
+                                                     "locator":  {
+                                                                     "kind":  "wrap",
+                                                                     "prefix":  "FullScreenDisplayModeIndex=",
+                                                                     "suffix":  ""
+                                                                 },
+                                                     "anchor":  null,
+                                                     "lines":  {
+                                                                   "1":  "FullScreenDisplayModeIndex=464",
+                                                                   "3":  "FullScreenDisplayModeIndex=201"
+                                                               }
+                                                 },
+                                                 {
+                                                     "desc":  "DisplayName=",
+                                                     "locator":  {
+                                                                     "kind":  "wrap",
+                                                                     "prefix":  "DisplayName=",
+                                                                     "suffix":  ""
+                                                                 },
+                                                     "anchor":  null,
+                                                     "lines":  {
+                                                                   "1":  "DisplayName=XB271HU",
+                                                                   "3":  "DisplayName=Q70A"
+                                                               }
+                                                 },
+                                                 {
+                                                     "desc":  "FullScreenDisplayMode=",
+                                                     "locator":  {
+                                                                     "kind":  "wrap",
+                                                                     "prefix":  "FullScreenDisplayMode=",
+                                                                     "suffix":  ""
+                                                                 },
+                                                     "anchor":  null,
+                                                     "lines":  {
+                                                                   "1":  "FullScreenDisplayMode=464",
+                                                                   "3":  "FullScreenDisplayMode=201"
+                                                               }
+                                                 }
+                                             ]
+                              },
+                  "CRIMSONDESERT":  {
+                                        "name":  "Crimson Desert",
+                                        "config":  "%LOCALAPPDATA%\\Pearl Abyss\\CD\\save\\user_engine_option_save.xml",
+                                        "fields":  [
+                                                       {
+                                                           "desc":  "\u003cOptionStringVector Name=\"_display\" _value=\"Q70A 0\"/\u003e (present/absent)",
+                                                           "locator":  {
+                                                                           "kind":  "exact",
+                                                                           "text":  "\u003cOptionStringVector Name=\"_display\" _value=\"Q70A 0\"/\u003e"
+                                                                       },
+                                                           "anchor":  "\t\t\u003cEngineOptionResolution Name=\"_resolutionOption\"\u003e",
+                                                           "lines":  {
+                                                                         "1":  "__ABSENT__",
+                                                                         "3":  "\t\t\t\u003cOptionStringVector Name=\"_display\" _value=\"Q70A 0\"/\u003e"
+                                                                     }
+                                                       }
+                                                   ]
+                                    },
+                  "POE2":  {
+                               "name":  "Path of Exile 2",
+                               "config":  "%USERPROFILE%\\Documents\\My Games\\Path of Exile 2\\poe2_production_Config.ini",
+                               "fields":  [
+                                              {
+                                                  "desc":  "adapter_uid=00000000-000116db-02 (present/absent)",
+                                                  "locator":  {
+                                                                  "kind":  "exact",
+                                                                  "text":  "adapter_uid=00000000-000116db-02"
+                                                              },
+                                                  "anchor":  "background_framerate_limit_enabled=false",
+                                                  "lines":  {
+                                                                "1":  "__ABSENT__",
+                                                                "3":  "adapter_uid=00000000-000116db-02"
+                                                            }
+                                              },
+                                              {
+                                                  "desc":  "adapter_name=NVIDIA GeForce RTX 3080 - Q70A (present/absent)",
+                                                  "locator":  {
+                                                                  "kind":  "exact",
+                                                                  "text":  "adapter_name=NVIDIA GeForce RTX 3080 - Q70A"
+                                                              },
+                                                  "anchor":  "adapter_uid=00000000-000116db-02",
+                                                  "lines":  {
+                                                                "1":  "__ABSENT__",
+                                                                "3":  "adapter_name=NVIDIA GeForce RTX 3080 - Q70A"
+                                                            }
+                                              }
+                                          ]
+                           }
+              }
+}
